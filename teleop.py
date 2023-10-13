@@ -7,14 +7,21 @@ if __name__ == '__main__':
     left = 72
     right = 75
 
-    camera = cv2.VideoCapture(0)  # Use the correct camera index if needed (e.g., 0, 1, or a camera address)
+    cap = cv2.VideoCapture(0)  # Use 0 as the argument for the primary camera
 
-    # Define the VideoWriter object to save video
-    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-    out = cv2.VideoWriter('circuit.avi', fourcc, 20.0, (640, 480)) # You may need to adjust frame size (640x480) and frame rate (20.0) to your requirements
 
+    if not cap.isOpened():
+        print("Error: Could not open camera.")
+    else:
+    # Define the codec and create a VideoWriter object
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')  # You can change the codec to your preference (e.g., 'XVID', 'MJPG', 'H264', etc.)
+        out = cv2.VideoWriter('circuit.avi', fourcc, 20.0, (640, 480))  # Adju
     while True:
-        car.stop()
+        ret, frame = cap.read()
+        if not ret:
+            print("Error: Could not read frame.")
+            break
+        out.write(frame)
         key = readchar.readkey()
         if key == 'w':
             car.control_car(left, right)
@@ -38,12 +45,7 @@ if __name__ == '__main__':
         else:
             car.stop()
 
-        # Capture a frame from the camera and write it to the video file
-        ret, frame = camera.read()
-        if not ret:
-            break
-
     # Write the frame to the video
+    cap.release()
     out.release()
-    camera.release()
     cv2.destroyAllWindows()# Release the VideoWriter object when done
