@@ -16,7 +16,6 @@ if __name__ == '__main__':
     while True:
         car.stop()
         key = readchar.readkey()
-
         if key == 'w':
             car.control_car(left, right)
         elif key == "s":
@@ -42,7 +41,7 @@ if __name__ == '__main__':
         # Capture a frame from the camera and write it to the video file
         ret, frame = camera.read()
         if not ret:
-            continue
+            break
 
     # Write the frame to the video
     out.release()
