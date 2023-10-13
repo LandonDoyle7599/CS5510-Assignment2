@@ -6,9 +6,10 @@ if __name__ == '__main__':
     car = Car()
     left = 72
     right = 75
-    #initialize recording of video to save in a file
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('video2.avi', fourcc, 20.0, (640, 480))
+
+    # Initialize recording of video to save in an MP4 file
+    fourcc = cv2.VideoWriter_fourcc(*'H264')
+    out = cv2.VideoWriter('video2.mp4', fourcc, 20.0, (640, 480))
 
     while True:
         car.stop()
@@ -34,3 +35,10 @@ if __name__ == '__main__':
             break
         else:
             car.stop()
+
+        # Capture a frame from the camera and write it to the video
+        frame = car.capture_frame()
+        out.write(frame)
+
+    # Release the video writer
+    out.release()
