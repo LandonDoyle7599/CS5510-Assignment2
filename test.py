@@ -5,7 +5,7 @@ from monovideoodometery import MonoVideoOdometery
 import os
 
 
-img_path = 'C:\\Users\\lando\\monocular\\Monocular-Video-Odometery\\testpngs\\'
+img_path = 'C:\\Users\\lando\\monocular\\Monocular-Video-Odometery\\captured_video\\'
 pose_path = 'C:\\Users\\lando\\monocular\\Monocular-Video-Odometery\\posedata\\tmp.txt'
 
 focal = 718.8560
