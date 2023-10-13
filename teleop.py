@@ -7,13 +7,16 @@ if __name__ == '__main__':
     left = 72
     right = 75
 
-    # Initialize recording of video to save in an MP4 file
-    fourcc = cv2.VideoWriter_fourcc(*'H264')
-    out = cv2.VideoWriter('video2.mp4', fourcc, 20.0, (640, 480))
+    camera = cv2.VideoCapture(0)  # Use the correct camera index if needed (e.g., 0, 1, or a camera address)
+
+    # Define the VideoWriter object to save video
+    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    out = cv2.VideoWriter('circuit.avi', fourcc, 20.0, (640, 480)) # You may need to adjust frame size (640x480) and frame rate (20.0) to your requirements
 
     while True:
         car.stop()
         key = readchar.readkey()
+
         if key == 'w':
             car.control_car(left, right)
         elif key == "s":
@@ -36,9 +39,12 @@ if __name__ == '__main__':
         else:
             car.stop()
 
-        # Capture a frame from the camera and write it to the video
-        frame = car.capture_frame()
-        out.write(frame)
+        # Capture a frame from the camera and write it to the video file
+        ret, frame = camera.read()
+        if not ret:
+            continue
 
-    # Release the video writer
+    # Write the frame to the video
     out.release()
+    camera.release()
+    cv2.destroyAllWindows()# Release the VideoWriter object when done
