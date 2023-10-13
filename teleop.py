@@ -17,6 +17,7 @@ if __name__ == '__main__':
         fourcc = cv2.VideoWriter_fourcc(*'XVID')  # You can change the codec to your preference (e.g., 'XVID', 'MJPG', 'H264', etc.)
         out = cv2.VideoWriter('circuit.avi', fourcc, 20.0, (640, 480))  # Adju
     while True:
+        car.stop()
         ret, frame = cap.read()
         if not ret:
             print("Error: Could not read frame.")
