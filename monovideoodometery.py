@@ -10,7 +10,8 @@ class MonoVideoOdometery(object):
                 focal_length = 718.8560,
                 pp = (607.1928, 185.2157), 
                 lk_params=dict(winSize  = (21,21), criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.01)), 
-                detector=cv2.FastFeatureDetector_create(threshold=25, nonmaxSuppression=True)):
+                detector=cv2.FastFeatureDetector_create(threshold=25, nonmaxSuppression=True),
+                start_frame=0):
         '''
         Arguments:
             img_file_path {str} -- File path that leads to image sequences
@@ -25,7 +26,10 @@ class MonoVideoOdometery(object):
         Raises:
             ValueError -- Raised when file either file paths are not correct, or img_file_path is not configured correctly
         '''
-
+        self.pose_x = 0
+        self.pose_y = 0
+        self.pose_z = 0
+        self.start_frame = start_frame
         self.file_path = img_file_path
         self.detector = detector
         self.lk_params = lk_params
@@ -33,21 +37,21 @@ class MonoVideoOdometery(object):
         self.pp = pp
         self.R = np.zeros(shape=(3, 3))
         self.t = np.zeros(shape=(3, 3))
-        self.id = 0
+        self.id = start_frame
         self.n_features = 0
 
         try:
             if not all([".png" in x for x in os.listdir(img_file_path)]):
                 raise ValueError("img_file_path is not correct and does not exclusively png files")
         except Exception as e:
-            print(e)
+            # print(e)
             raise ValueError("The designated img_file_path does not exist, please check the path and try again")
 
         try:
             with open(pose_file_path) as f:
                 self.pose = f.readlines()
         except Exception as e:
-            print(e)
+            # print(e)
             raise ValueError("The pose_file_path is not valid or did not lead to a txt file")
 
         self.process_frame()
@@ -105,7 +109,7 @@ class MonoVideoOdometery(object):
 
         # If the frame is one of first two, we need to initalize
         # our t and R vectors so behavior is different
-        if self.id < 2:
+        if self.id < self.start_frame + 2:
             E, _ = cv2.findEssentialMat(self.good_new, self.good_old, self.focal, self.pp, cv2.RANSAC, 0.999, 1.0, None)
             _, self.R, self.t, _ = cv2.recoverPose(E, self.good_old, self.good_new, self.R, self.t, self.focal, self.pp, None)
         else:
@@ -148,14 +152,29 @@ class MonoVideoOdometery(object):
         Returns:
             float -- Scalar value allowing for scale estimation
         '''
-        pose = self.pose[self.id - 1].strip().split()
-        x_prev = float(pose[3])
-        y_prev = float(pose[7])
-        z_prev = float(pose[11])
-        pose = self.pose[self.id].strip().split()
-        x = float(pose[3])
-        y = float(pose[7])
-        z = float(pose[11])
+        # pose = self.pose[self.id - 1].strip().split()
+        x_prev = self.pose_x
+        y_prev = self.pose_y
+        z_prev = self.pose_z
+        # pose = self.pose[self.id].strip().split()
+
+        # For larger dataset
+        # going 'up'
+        # if self.id < 2000 or 6000 < self.id < 8000:
+        #     self.pose_z -= 0.15
+        # # going 'left'
+        # elif 2000 < self.id < 3000 or 8000 < self.id < 9000:
+        #     self.pose_x -= 0.15
+        # # going 'down'
+        # elif 3000 < self.id < 5000 or 9000 < self.id < 11_000:
+        #     self.pose_z += 0.15
+        # # going 'right'
+        # elif 5000 < self.id < 6000 or 11_000 < self.id < 12_000:
+        #     self.pose_x += 0.15
+        self.pose_z += 5.0
+        x = float(self.pose_x)
+        y = float(self.pose_y)
+        z = float(self.pose_z)
 
         true_vect = np.array([[x], [y], [z]])
         self.true_coord = true_vect
@@ -167,12 +186,12 @@ class MonoVideoOdometery(object):
     def process_frame(self):
         '''Processes images in sequence frame by frame
         '''
-
-        if self.id < 2:
+        print(self.id)
+        if self.id < self.start_frame + 2:
             self.old_frame = cv2.imread(self.file_path +str().zfill(6)+'.png', 0)
             self.current_frame = cv2.imread(self.file_path + str(1).zfill(6)+'.png', 0)
             self.visual_odometery()
-            self.id = 2
+            self.id = self.start_frame + 2
         else:
             self.old_frame = self.current_frame
             self.current_frame = cv2.imread(self.file_path + str(self.id).zfill(6)+'.png', 0)

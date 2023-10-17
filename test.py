@@ -5,8 +5,8 @@ from monovideoodometery import MonoVideoOdometery
 import os, pathlib
 
 
-img_path = 'D:\\School\\S7\\robots-temp\\captured_video\\'
-pose_path = 'D:\\School\\S7\\robots-temp\\posedata\\tmp.txt'
+img_path = 'C:\\Users\\lando\\RobotIntelligence\\CS5510-Assignment2\\captured_video\\'
+pose_path = 'C:\\Users\\lando\\RobotIntelligence\\CS5510-Assignment2\\posedata\\tmp.txt'
 
 focal = 718.8560
 pp = (607.1928, 185.2157)
